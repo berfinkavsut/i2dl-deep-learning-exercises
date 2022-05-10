@@ -26,6 +26,11 @@ Continue with installation of requirements and starting jupyter notebook using:
 
 Jupyter notebooks use the python version of the current active environment so make sure to always activate the `i2dl` environment before working on notebooks for this class.
 
+Note: How to check current Python environment?
+
+import sys
+print(sys.prefix)
+
 ## 2. Exercise Download
 
 The exercises will be uploaded to the [course website](https://dvl.in.tum.de/teaching/i2dl-ws20/) as well as our forum. You can download the exercises directly from there. Each time we start a new exercise you will have to unzip the exercise and copy it into the current directory as we are utilizing some shared folders.
