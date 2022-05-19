@@ -43,9 +43,34 @@ class DataLoader:
         #       - build_batch_iterator                                         #
         #     in section 1 of the notebook.                                    #
         ########################################################################
+       
+        # modify for drop_last 
+        # batch number is wrong!
+        if self.shuffle:
+            index_iterator = iter(np.random.permutation(self.__len__()))  # define indices as iterator
+        else:
+            index_iterator = iter(range(self.__len__()))  # define indices as iterator
 
-        pass
-
+        batch = []
+        # count = 0
+        for index in index_iterator:  # iterate over indices using the iterator
+            batch.append(self.dataset[index])
+            if len(batch) == self.batch_size:
+                #count = count + 1 
+                #print('Batch:%d' % count, batch)
+                batch_dict = {}
+                values = []
+                for data_dict in batch:
+                    for key, value in data_dict.items():
+                        if key not in batch_dict:
+                            batch_dict[key] = []  
+                        values.append(value)
+                    batch_dict[key] = np.array(values)
+                # print('Yielded batch dict:', batch_dict)
+                yield batch_dict  # use yield keyword to define a iterable generator
+                batch_dict = {}
+                batch = []
+            
         ########################################################################
         #                           END OF YOUR CODE                           #
         ########################################################################
@@ -59,7 +84,10 @@ class DataLoader:
         # Don't forget to check for drop last!                                 #
         ########################################################################
 
-        pass
+        if(self.drop_last==True):
+            length = int(len(self.dataset) / self.batch_size)
+        else:
+            length = int(len(self.dataset) / self.batch_size) + 1
 
         ########################################################################
         #                           END OF YOUR CODE                           #

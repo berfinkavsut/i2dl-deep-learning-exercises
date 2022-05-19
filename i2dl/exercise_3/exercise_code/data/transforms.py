@@ -27,8 +27,7 @@ class RescaleTransform:
         #   - from (self._data_min, self._data_max)                            #
         #   - to (self.min, self.max)                                          #
         ########################################################################
-           
-        
+             
         images = images - self._data_min
         images = images / (self._data_max - self._data_min)
         images = images * (self.max - self.min) + self.min
@@ -88,7 +87,10 @@ class NormalizeTransform:
         #   - divide by standard deviation                                     #
         ########################################################################
 
-        pass
+        for i in range(images.shape[-1]):
+            images_ch = images[:,:,i]
+            images_ch = images_ch - self.mean[i]
+            images_ch = images_ch / self.std[i]
 
         ########################################################################
         #                           END OF YOUR CODE                           #
