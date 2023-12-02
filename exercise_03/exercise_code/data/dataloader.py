@@ -44,20 +44,16 @@ class DataLoader:
         #     in section 1 of the notebook.                                    #
         ########################################################################
        
-        # modify for drop_last 
-        # batch number is wrong!
+        #TODO: modify for drop_last 
         if self.shuffle:
             index_iterator = iter(np.random.permutation(self.__len__()))  # define indices as iterator
         else:
             index_iterator = iter(range(self.__len__()))  # define indices as iterator
 
         batch = []
-        # count = 0
         for index in index_iterator:  # iterate over indices using the iterator
             batch.append(self.dataset[index])
             if len(batch) == self.batch_size:
-                #count = count + 1 
-                #print('Batch:%d' % count, batch)
                 batch_dict = {}
                 values = []
                 for data_dict in batch:
@@ -66,7 +62,6 @@ class DataLoader:
                             batch_dict[key] = []  
                         values.append(value)
                     batch_dict[key] = np.array(values)
-                # print('Yielded batch dict:', batch_dict)
                 yield batch_dict  # use yield keyword to define a iterable generator
                 batch_dict = {}
                 batch = []
