@@ -94,10 +94,8 @@ class Relu:
         # Implement the forward pass of Relu activation function               #
         ########################################################################
 
-        ind = (x > 0)
-        sh = x.shape
-        outputs = np.zeros(sh)
-        outputs[ind] = x[ind]
+        outputs = np.zeros_like(x)
+        outputs[x > 0] = x[x > 0]
         cache = (x, outputs)
 
         ########################################################################
@@ -116,8 +114,7 @@ class Relu:
         ########################################################################
 
         x, out = cache
-        sh = x.shape
-        dx = np.zeros(sh)
+        dx = np.zeros_like(x)
         dx[out > 0] = dout[out > 0]
 
         ########################################################################
@@ -145,8 +142,7 @@ class LeakyRelu:
         ########################################################################
 
         # f(x)=1(x<0)(αx)+1(x>=0)(x)  
-        sh = x.shape
-        outputs = np.zeros(sh)
+        outputs = np.zeros_like(x)
         outputs[x>0] = x[x>0]
         outputs[x<0] = self.slope*x[x<0]
         cache = x, outputs
@@ -167,8 +163,7 @@ class LeakyRelu:
         ########################################################################
         
         x, out = cache
-        sh = x.shape
-        dx = np.zeros(sh)
+        dx = np.zeros_like(x)
         dx[out > 0] = dout[out > 0]
         dx[out < 0] = self.slope * dout[out < 0]
         ########################################################################
