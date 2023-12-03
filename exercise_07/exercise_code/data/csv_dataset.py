@@ -42,6 +42,11 @@ class CSVDataset(Dataset):
 
         self.data.iloc[0]['OverallQual'] = np.nan
 
+    def __call__(self, msg):
+      print(msg)
+      print("Call operator / Functor")
+
+    # magic methods or dunder (double under) methods 
     def __len__(self):
         return len(self.data)
 
