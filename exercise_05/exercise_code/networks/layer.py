@@ -67,11 +67,9 @@ class Relu:
         # TODO:                                                                #
         # Implement the forward pass of Relu activation function               #
         ########################################################################
-        
-        ind = (x > 0)
-        sh = x.shape
-        out = np.zeros(sh)
-        out[ind] = x[ind]
+
+        out = np.zeros_like(x)
+        out[x > 0] = x[x > 0]
         cache = (x, out)
 
         ########################################################################
@@ -94,8 +92,7 @@ class Relu:
         ########################################################################
         
         x, out = cache
-        sh = x.shape
-        dx = np.zeros(sh)
+        dx = np.zeros_like(x)
         dx[out > 0] = dout[out > 0]
         
         ########################################################################
@@ -127,8 +124,8 @@ def affine_forward(x, w, b):
     ########################################################################
     
     z = np.reshape(x, (N,-1))
-    X = np.concatenate( (z, np.ones( (N,1) )), axis=1)
-    W = np.concatenate( (w, np.reshape(b, (1,M) )) , axis=0) 
+    X = np.concatenate((z, np.ones((N,1))), axis=1)
+    W = np.concatenate((w, np.reshape(b, (1,M))), axis=0) 
     out = X.dot(W)
     
     ########################################################################
@@ -160,7 +157,7 @@ def affine_backward(dout, cache):
 
     N, D, M= x.shape[0], w.shape[0], w.shape[1]
     dx = dout.dot(w.T) # (N,M)x(M,D)=(N,D)
-    dx = np.reshape(dx, x.shape) # (N,D) => (N, d_1, ... d_k)
+    dx = np.reshape(dx, x.shape) # from (N,D) to (N, d_1, ... d_k)
     
     z = np.reshape(x, (N,D)) # (N,D)
     dw = z.T.dot(dout) # (D,N)x(N,M)=(D,M) 

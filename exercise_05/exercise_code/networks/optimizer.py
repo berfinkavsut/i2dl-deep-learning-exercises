@@ -125,7 +125,6 @@ class SGDMomentum(object):
         ########################################################################
         
         beta = config['momentum']
-        v = config['velocity']
 
         v = beta*v - lr*dw
         next_w = w + v
@@ -221,8 +220,8 @@ class Adam(object):
         #########################################################################
         # TODO: Look at the Adam implementation.                                #
         #########################################################################
-        m = config['m']
-        v = config['v']
+        m = config['m'].copy()
+        v = config['v'].copy()
         t = config['t']
         beta1 = config['beta1']
         beta2 = config['beta2']
