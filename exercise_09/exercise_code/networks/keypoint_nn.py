@@ -4,9 +4,8 @@ import torch
 import torch.nn as nn
 import pytorch_lightning as pl
 
-# TODO: Choose from either model and uncomment that line
-# class KeypointModel(nn.Module):
-class KeypointModel(pl.LightningModule):
+class KeypointModel(nn.Module):
+# class KeypointModel(pl.LightningModule):
     """Facial keypoint detection model"""
     def __init__(self, hparams):
         """
@@ -37,7 +36,6 @@ class KeypointModel(pl.LightningModule):
         # allow you to be quick and flexible.                                  #
         ########################################################################
         
-        
         input_size = hparams['input_size']
         output_size = hparams['output_size']
         kernel_size = hparams['kernel_size']
@@ -48,93 +46,52 @@ class KeypointModel(pl.LightningModule):
         cnn_layer = hparams['cnn_layer']
         fc_layer = hparams['fc_layer']
         
-        W = input_size
+        N = input_size
         K = kernel_size
         P = padding
         S = stride
         H = first_depth
 
+        self.model = nn.Sequential()
+
+        # Convolutional layers 
+        out = N 
         in_channels = 1
         out_channels = H
 
-        self.model = nn.Sequential()
-
-        # print('****************************************************************')
         for i in range(cnn_layer):
-          self.model.add_module( "conv" + str(i+1), nn.Conv2d(in_channels = in_channels, out_channels = out_channels, kernel_size = kernel_size, padding = P) )
-          self.model.add_module( "max_pool" + str(i+1), nn.MaxPool2d(kernel_size = 2, stride = S, padding = P) )
-          self.model.add_module( "relu" + str(i+1), nn.ReLU() )
+            self.model.add_module("conv" + str(i+1), nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, stride=1, padding=P))
+            self.model.add_module("max_pool" + str(i+1), nn.MaxPool2d(kernel_size=2, stride=S, padding=P))
+            self.model.add_module("relu" + str(i+1), nn.ReLU())
 
-          #TODO: out size is not correct! 
-          out = ((W-K+2*P)/S)+1 
-          out = ((out-2+2*P)/S)+1 
-          W = out 
-          in_channels = out_channels
-          out_channels *= 2
-        self.model.add_module( "flatten", nn.Flatten() ) # default setting 
-        # print(self.model)
-        # print('****************************************************************')
+            out = ((out-K+2*P)/S)+1   # after filter 
+            out = ((out-2+2*P)/S)+1   # after pooling 
+            in_channels = out_channels
+            out_channels *= 2
 
-        W = int(W)
-        input_size = in_channels * W * W
-        out = hidden_size
-        # print("input_size:", input_size)
-        # print("out:", out)
+        # Flatten before fully connected layers
+        self.model.add_module("flatten", nn.Flatten())
+
+        # Linear layers 
+        input_size = out_channels * N * N
+        output_size = hidden_size
 
         for i in range(fc_layer):
-          self.model.add_module("fc" + str(i+1), nn.Linear(in_features = input_size, out_features = out))
-          self.model.add_module("relu_fc" + str(i+1), nn.ReLU() )
-          input_size = out
-          out = out // 2
-          # print("input_size:", input_size)
-          # print("out:", out)
+            self.model.add_module("fc" + str(i+1), nn.Linear(in_features=input_size, out_features=output_size))
+            self.model.add_module("relu_fc" + str(i+1), nn.ReLU())
+            input_size = output_size
+            output_size = output_size // 2
 
-       
-        self.model.add_module("output", nn.Linear(in_features = input_size, out_features = output_size) )
-       
+        # Output layer 
+        self.model.add_module("output", nn.Linear(in_features=input_size, out_features=output_size))
 
-        # self.layers = []        
-        
-        # for i in range(cnn_layer):
-        #   self.layers.append( nn.Conv2d(in_channels = in_channels, out_channels = out_channels, kernel_size = kernel_size, padding=P) )
-        #   self.layers.append( nn.MaxPool2d(kernel_size = P, stride = S) )
-        #   self.layers.append( nn.ReLU() )
+        # NOTE: How to calculate the number of model parameters? 
+        # self.conv = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=2))
+        # N_out = (N_in - K + 2P) / S 
+        # model_param_num = out_channels * (in_channels* K * K + 1)
+        # Here, in_channels is the kernel depth, out_channels is the number of feature maps.
+        # 1 is added for the bias parameter of each kernel.
 
-        #   #TODO: out size is not correct! 
-        #   out = ((W-K+2*P)/S)+1 
-        #   W = out
-        #   in_channels = out_channels
-        #   out_channels *= 2
-
-        # self.layers.append(nn.Flatten() ) # default setting 
-        
-       
-        # W = int(W)
-        # input_size = in_channels * W * W
-        # out = hidden_size
-        
-        # print("W:", W)
-        # print("in_channels:", in_channels)
-        # print("input_size:", input_size)
-        # print("out:", out)
-
-        # for i in range(fc_layer):
-        #   self.layers.append(nn.Linear(in_features = input_size, out_features = out))
-        #   self.layers.append(nn.ReLU() )
-        #   input_size = out
-        #   out = out // 2
-        #   print("input_size:", input_size)
-        #   print("out:", out)
-
-       
-        # self.layers.append(nn.Linear(in_features = input_size, out_features = output_size) )
-        
-        # self.model = nn.Sequential(*self.layers)
-
-        # print('****************************************************************')
-        # print(self.model)
-        # print('****************************************************************')
-        
         ########################################################################
         #                           END OF YOUR CODE                           #
         ########################################################################
@@ -148,10 +105,10 @@ class KeypointModel(pl.LightningModule):
         # TODO: Define the forward pass behavior of your model                 #
         # for an input image x, forward(x) should return the                   #
         # corresponding predicted keypoints.                                   #
-        # NOTE: what is the required output size?                              #
         ########################################################################
 
         x = self.model(x)
+
         ########################################################################
         #                           END OF YOUR CODE                           #
         ########################################################################
