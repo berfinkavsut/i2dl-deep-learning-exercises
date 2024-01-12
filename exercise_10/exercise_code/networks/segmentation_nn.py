@@ -14,8 +14,8 @@ class SegmentationNN(pl.LightningModule):
         # TODO - Train Your Model                                              #
         ########################################################################
 
-        #input dimension: (N,C,H,W)
-        #output dimensions: (N,num_classes,H,W)
+        # input dimension: (N,C,H,W)
+        # output dimensions: (N,num_classes,H,W)
         depth = hparams['channels']
         height = hparams['height']
         width = hparams['width']
@@ -31,9 +31,6 @@ class SegmentationNN(pl.LightningModule):
 
         for p in self.image_backbone.parameters():
             p.requires_grad = False
-
-        # print(self.image_backbone)
-
 
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(in_channels=256, out_channels=256, kernel_size=(3,3),stride=(2, 2), padding=(1, 1) ),
@@ -78,7 +75,6 @@ class SegmentationNN(pl.LightningModule):
         #######################################################################
 
         x = self.image_backbone(x)
-        #print(x.shape)
         x = torch.reshape(x,(-1,256,196)).view(1,256,14,14)
         x = self.decoder(x)
         return x
