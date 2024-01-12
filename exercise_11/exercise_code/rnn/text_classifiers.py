@@ -46,7 +46,6 @@ class RNNClassifier(nn.Module):
         self.fc = nn.Linear(num_layers * hidden_size, 1)
         self.output = nn.Sigmoid()
 
-
         ########################################################################
         #                           END OF YOUR CODE                           #
         ########################################################################
@@ -85,7 +84,6 @@ class RNNClassifier(nn.Module):
         x = self.fc(h) 
         output = self.output(x)
         output = output.reshape((batch_size,))
-
 
         ########################################################################
         #                           END OF YOUR CODE                           #

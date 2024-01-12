@@ -232,8 +232,7 @@ class Embedding(nn.Module):
             embeddings: A float tensor of size (seq_len, batch_size, embedding_dim)
         """
 
-        # Ensure <eos> always return zeros
-        # and padding gradient is always 0
+        # Ensure <eos> always return zeros and padding gradient is always 0
         weight = self.weight * self.padding_mask
 
         embeddings = None
@@ -243,11 +242,7 @@ class Embedding(nn.Module):
         # hint: It is very short                                               #
         ########################################################################
       
-        # print('inputs:', inputs )
-        # embeddings = weight[inputs]
-        # embeddings =  F.embedding(inputs, self.weight, self.padding_idx)
         embeddings = F.embedding(inputs, self.weight, self.padding_idx)
-
 
         ########################################################################
         #                           END OF YOUR CODE                           #
